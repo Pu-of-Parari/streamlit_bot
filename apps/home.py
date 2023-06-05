@@ -1,6 +1,11 @@
 import streamlit as st
 from streamlit_chat import message
+from utils.load_config import load_openai_key
+from langchain.llms import OpenAI
 
+
+load_openai_key("../config.ini")
+llm = OpenAI(model_name="text-davinci-003")
 
 if "generated" not in st.session_state:
     st.session_state.generated = []
@@ -15,7 +20,8 @@ with st.form("Botくんにブレインストーミングの進行をしてもら
 
     if submitted:
         st.session_state.past.append(user_message)
-        st.session_state.generated.append("ok.")
+        # st.session_state.generated.append("ok.")
+        st.session_state.generated.append(llm("こんにちは"))
 
     if st.session_state['generated']:
         for i in range(len(st.session_state['generated'])):
