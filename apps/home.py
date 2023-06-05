@@ -1,11 +1,11 @@
 import streamlit as st
 from streamlit_chat import message
+
 from utils.load_config import load_openai_key
-from langchain.llms import OpenAI
+from utils.chat_utils import load_conversation
 
 
 load_openai_key("../config.ini")
-llm = OpenAI(model_name="text-davinci-003")
 
 if "generated" not in st.session_state:
     st.session_state.generated = []
@@ -19,25 +19,27 @@ with st.form("Botくんにブレインストーミングの進行をしてもら
     submitted = st.form_submit_button("Send")
 
     if submitted:
+        conversation = load_conversation()
+        answer = conversation.predict(input=user_message)
+
         st.session_state.past.append(user_message)
-        # st.session_state.generated.append("ok.")
-        st.session_state.generated.append(llm("こんにちは"))
+        st.session_state.generated.append(answer)
 
-    if st.session_state['generated']:
-        for i in range(len(st.session_state['generated'])):
-            # user
-            message(
-                st.session_state['past'][i],
-                is_user=True,
-                key=str(i) + "_user",
-                avatar_style="thumbs",
-                seed=10
-            )
+        if st.session_state['generated']:
+            for i in range(len(st.session_state['generated'])):
+                # user
+                message(
+                    st.session_state['past'][i],
+                    is_user=True,
+                    key=str(i) + "_user",
+                    avatar_style="thumbs",
+                    seed=10
+                )
 
-            # bot
-            message(
-                st.session_state['generated'][i],
-                key=str(i),
-                avatar_style="shapes",
-                seed=10
-            )
+                # bot
+                message(
+                    st.session_state['generated'][i],
+                    key=str(i),
+                    avatar_style="shapes",
+                    seed=10
+                )
